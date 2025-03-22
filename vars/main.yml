@@ -1,0 +1,23 @@
+---
+# yamllint disable rule:line-length
+###############################################################################
+# Ansible-VENV Role Options
+###############################################################################
+
+# Last time Ansible-VENV options were validated against default configuration.
+avenv_role_validate_date: '2025-03-21'
+avenv_role_validate_release: 'bookworm'
+
+###############################################################################
+# APT Packages
+###############################################################################
+#
+# Reference:
+# * https://stackoverflow.com/questions/41573587/what-is-the-difference-between-venv-pyvenv-pyenv-virtualenv-virtualenvwrappe
+
+avenv_role_packages:
+  - 'python3'
+  - 'python3-virtualenv'
+
+avenv_role_packages_setuptools:
+  - 'python3-setuptools'

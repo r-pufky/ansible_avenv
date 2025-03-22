@@ -1,0 +1,57 @@
+---
+# yamllint disable rule:line-length
+# Confirm:
+# * Virtual environment directory created.
+# * Virtual environment works (via exec script pip list for other tests).
+# * Sourcing requirements.txt from ansible controller works.
+# * Searching for requirements.txt from a specified location works.
+dependency:
+  name: 'galaxy'
+driver:
+  name: 'podman'
+provisioner:
+  name: 'ansible'
+  config_options:
+    defaults:
+      interpreter_python: 'auto_silent'
+      callback_whitelist: 'profile_tasks, timer, yaml'
+    ssh_connection:
+      pipelining: false
+  inventory:
+    group_vars:
+      all:
+        avenv_pip_requirements_source: '{{ lookup("env", "MOLECULE_SCENARIO_DIRECTORY") }}/files/requirements_controller.txt'
+        avenv_pip_requirements_install: '/tmp'
+        avenv_pips:
+          - comment: 'Upgrade these when installing'
+            name:
+              - 'stopwords'
+            extra_args: '--upgrade'
+platforms:
+  - name: 'avenv-debian-12-default'
+    image: 'ghcr.io/hifis-net/debian-systemd:12'
+    systemd: 'always'
+    volumes:
+      - '/sys/fs/cgroup:/sys/fs/cgroup:ro'
+    command: '/lib/systemd/systemd'
+    pre_build_image: true
+verifier:
+  name: 'ansible'
+lint: |
+  set -e
+  yamllint .
+  ansible-lint .
+scenario:
+  test_sequence:
+    # - 'dependency'
+    # - 'cleanup'
+    - 'destroy'
+    - 'syntax'
+    - 'create'
+    - 'prepare'
+    - 'converge'
+    # - 'idempotence'  # Files created, deleted.
+    # - 'side_effect'
+    - 'verify'
+    # - 'cleanup'
+    - 'destroy'

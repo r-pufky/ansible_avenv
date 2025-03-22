@@ -1,0 +1,62 @@
+---
+###############################################################################
+# Ansible-VENV Configuration
+###############################################################################
+
+# Virtual environment config directory.
+#
+# All generated virtual environments will be created here.
+#
+# Default: '/var/venv'.
+avenv_config_dir: '/var/venv'
+
+# Virtual environment name.
+#
+# Created under avenv_service_config_dir.
+#
+# Default: 'venv'.
+avenv_name: 'venv'
+
+# Install virtual environment helper script?
+#
+# Deployed to: avenv_config_dir/avenv_name/bin/exec
+#
+# Helper script to execute command in virtual environment. Must be executed in
+# current shell, not subshell (use source or .):
+# * ./exec pip list
+# * source exec pip list
+#
+# Default: True.
+avenv_script_install: true
+
+# Virtual environment helper script name.
+#
+# Change if there are naming conflicts within the virtual environment.
+#
+# Default: 'exec'.
+avenv_script_name: 'exec'
+
+###############################################################################
+# Ansible-VENV User
+###############################################################################
+
+# User Ansible-VENV will created under. Must exist on system. Default: 'root'.
+avenv_user: 'root'
+
+# Group Ansible-VENV will created under. Default: 'root'.
+avenv_group: 'root'
+
+# Virtual environment permissions.
+#
+# Applied recursively with avenv_user:avenv_group ownership after virtual
+# environment created. These should be as restrictive as possible as virtual
+# environments tend to treat the principal of least privilege as a second class
+# citizen.
+#
+# Values:
+#   {OCTAL}: Use octal permissions.
+#   {NAMED}: Use named permissions (e.g. 'a-st,g-w,o-rwx').
+#        '': Disable.
+#
+# Default: 'a-st,g-w,o-rwx' (all: remove sticky bits, group:write, other:all).
+avenv_mode: 'a-st,g-w,o-rwx'

@@ -1,0 +1,9 @@
+#!/bin/bash
+#
+# Execute command in virtual environment.
+#
+# Must be executed in current shell, not subshell (use source or .):
+# ./exec pip list
+# source exec pip list
+#
+source {{ _avenv_venv }}/bin/activate && $@

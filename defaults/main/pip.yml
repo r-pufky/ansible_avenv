@@ -1,0 +1,178 @@
+---
+###############################################################################
+# Default PIP Options
+###############################################################################
+# These options are used for any unspecified avenv_pips options.
+
+# Allow pip to modify externally-managed Python installation (PEP 668)?
+#
+# Default: False.
+avenv_pip_break_system_packages: false
+
+# Change to this directory before running commands.
+#
+# Default: '' (omit).
+avenv_pip_chdir: ''
+
+# Pass the editable flag? Default: False.
+avenv_pip_editable: false
+
+# Absolute path to pip executable.
+#
+# If different from Ansible Python interpreter used with pip. Mutually
+# exclusive with virtualenv. Python setuptools will automatically be installed
+# if used.
+#
+# Default: '' (omit).
+avenv_pip_executable: ''
+
+# Extra arguments passed to pip. Default: '' (omit).
+avenv_pip_extra_args: ''
+
+# Package install state.
+#
+# Values:
+#           absent: Remove packages.
+#   forcereinstall: Force install packages.
+#           latest: Install latest packages.
+#          present: Ensure package is installed (default).
+#
+# Default: 'present'.
+avenv_pip_state: 'present'
+
+# Octal file mask to use during package installation. Default: '' (omit).
+avenv_pip_umask: ''
+
+# Absolute path or command to create environment.
+#
+# Additional virtual environment commands may be added via avenv_packages.
+#
+# Default: 'virtualenv'.
+avenv_pip_virtualenv_command: 'virtualenv'
+
+# Python executable used for creating the virtual environment.
+#
+# When not specified Python version used to run ansible module is used.
+#
+# Special Case:
+#   *: Do not use when virtualenv_command='pyenv'|'-m 'venv'.
+#
+# Default: '' (omit).
+avenv_pip_virtualenv_python: ''
+
+# Inherit packages from global site-packages directory?
+#
+# Note that if this setting is changed on an already existing virtual
+# environment it will not have any effect, the environment must be deleted and
+# newly created.
+#
+# Default: False.
+avenv_pip_virtualenv_site_packages: false
+
+###############################################################################
+# Requirements Files
+###############################################################################
+# independently manage requirements.txt in additional to explicitly specifying
+# it for PIP installations.
+
+# Custom requirements file.
+#
+# Sourced from ansible controller; automatically applied to venv_name.
+#
+# Special Case:
+#   *: Applied independently from avenv_requirements_install.
+#   *: Applied with avenv_pip_* options.
+#
+# avenv_requirements_source: 'host_vars/venv.example.com/data/requirements.txt'
+#
+# Default: '' (disabled).
+avenv_pip_requirements_source: ''
+
+# Install requirements.txt files from specified location.
+#
+# Location will be searched recursively for all 'requirements.txt' files and
+# installed in found order.
+#
+# Special Case:
+#   *: Applied independently from avenv_pip_requirements_source.
+#   *: Applied with avenv_pip_* options.
+#
+# Values:
+#   {PATH}: Absolute path to search directory.
+#       '': Disable (default).
+#
+# Default: '' (disabled).
+avenv_pip_requirements_install: ''
+
+###############################################################################
+# PIP Package Management
+###############################################################################
+
+# List of PIP packages to install inside VENV.
+#
+# PIP install options override default avenv_pip_* options.
+#
+# avenv_pips:
+#     list of dict - ansible.builtin.pip.
+#   - comment: str - Package comment notes.
+#         Default: omit.
+#   - break_system_packages: bool - Allow pip to modify an externally-managed
+#           Python installation as defined by PEP 668.
+#         Default: avenv_pip_break_system_packages.
+#     chdir: str - Change to this directory before running the command.
+#         Default: avenv_pip_chdir.
+#     editable: bool - Pass the editable flag?
+#         Default: avenv_pip_editable.
+#     executable: str - Absolute path to pip executable, if different from the
+#           Ansible Python interpreter used with pip. Mutually exclusive with
+#           virtualenv. Python setuptools will automatically be installed if
+#           used.
+#         Default: avenv_pip_executable.
+#     extra_args: str - Extra arguments passed to pip.
+#         Default: avenv_pip_extra_args.
+#     name: str or list of str - Python library to install or the
+#           url(bzr+,hg+,git+,svn+) of the remote package.
+#     requirements: str - Absolute path to requirements file, which should be
+#           local to the remote system. Alternatively use
+#           avenv_pip_requirements_install or avenv_pip_requirements_source.
+#         Default: omit.
+#     state: str - Package install state.
+#         Values:
+#                   absent: Remove packages.
+#           forcereinstall: Force install packages.
+#                   latest: Install latest packages.
+#                  present: Ensure package is installed (default).
+#         Default: avenv_pip_state.
+#     umask: str - Octal file mask to use during package installation.
+#         Default: avenv_pip_umask.
+#     version: str - Version to install of Python library specified in name
+#           parameter.
+#         Default: omit.
+#     virtualenv_command: str - Absolute path or command to create virtual
+#           environment. Additional virtual environment commands may be added
+#           via avenv_packages.
+#         Default: avenv_pip_virtualenv.
+#     virtualenv_python: str - Python executable used for creating the virtual
+#           environment. When not specified Python version used to run ansible
+#           module is used.
+#         Special Case:
+#           *: Do not use when virtualenv_command='pyenv'|'-m 'venv'.
+#         Default: avenv_pip_virtualenv_python.
+#     virtualenv_site_packages: bool - Inherit packages from global
+#           site-packages directory? Note that if this setting is changed on an
+#           already existing virtual environment it will not have any effect,
+#           the environment must be deleted and newly created.
+#         Default: avenv_pip_virtualenv_site_packages.
+#
+# avenv_pips:
+#   - name:
+#       - 'nltk'
+#       - 'numpy'
+#   - comment: 'Upgrade these when installing'
+#     name:
+#       - 'stopwords'
+#       - 'punkt'
+#     extra_args: '--upgrade'
+#
+# Default: [].
+avenv_pips: []

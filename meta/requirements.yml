@@ -1,0 +1,6 @@
+---
+# yamllint disable rule:line-length
+collections: []
+
+roles:
+  - name: 'r_pufky.srv.apt'  # https://github.com/r-pufky/ansible_collection_srv

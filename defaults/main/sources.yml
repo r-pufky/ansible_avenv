@@ -1,0 +1,28 @@
+---
+# yamllint disable rule:line-length
+###############################################################################
+# APT Packages
+###############################################################################
+# Additional packages needed to create virtual environment. python3-virtualenv
+# will always be installed.
+#
+# Reference:
+# * https://stackoverflow.com/questions/41573587/what-is-the-difference-between-venv-pyvenv-pyenv-virtualenv-virtualenvwrappe
+
+# Ansible-VENV packages to install. Default: [].
+avenv_packages: []
+
+# Ansible-VENV packages to remove. Default: [].
+avenv_packages_absent: []
+
+# Ansible-VENV apt sources to add.
+#
+# Additional APT sources for Ansible-VENV installation. Configure in main APT
+# management if using main debian repositories (DEB822 will overwrite existing
+# APT sources based on signing keys, potentially removing configured APT
+# sources).
+#
+# Uses r_pufky.srv.apt.apt_sources format.
+#
+# Default: [] (unmanaged).
+avenv_apt_sources: []

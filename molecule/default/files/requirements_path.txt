@@ -1,0 +1,2 @@
+-i https://pypi.python.org/simple
+anyio==4.8.0; python_version >= '3.9'

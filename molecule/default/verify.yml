@@ -1,0 +1,48 @@
+---
+# yamllint disable rule:line-length
+- name: 'Default | verify'
+  hosts: 'all'
+  gather_facts: false
+  tasks:
+    - name: 'Default | verify | query /var/venv/venv'
+      ansible.builtin.stat:
+        path: '/var/venv/venv'
+      register: _test_avenv_venv
+
+    # Simple ansible tasks, confirm path parsed correctly.
+    - name: 'Default | verify | assert /var/venv/venv'
+      ansible.builtin.assert:
+        that:
+          - _test_avenv_venv.stat.exists
+        fail_msg: '/var/venv/venv should exist.'
+
+    - name: 'Default | verify | query PIP packages'
+      ansible.builtin.shell: 'set -o pipefail && source /var/venv/venv/bin/exec pip list'
+      args:
+        executable: '/bin/bash'
+      changed_when: false
+      register: _test_avenv_pip
+
+    - name: 'Default | verify | assert user defined packages'
+      ansible.builtin.assert:
+        that:
+          - '"stopwords" in _test_avenv_pip.stdout'
+        fail_msg: >
+          stopwords PIP package should be installed.
+          ({{ _test_avenv_pip.stdout }}).
+
+    - name: 'Default | verify | assert controller requirements.txt'
+      ansible.builtin.assert:
+        that:
+          - '"amqp" in _test_avenv_pip.stdout'
+        fail_msg: >
+          amqp PIP package should be installed.
+          ({{ _test_avenv_pip.stdout }}).
+
+    - name: 'Default | verify | assert path requirements.txt'
+      ansible.builtin.assert:
+        that:
+          - '"anyio" in _test_avenv_pip.stdout'
+        fail_msg: >
+          anyio PIP package should be installed.
+          ({{ _test_avenv_pip.stdout }}).

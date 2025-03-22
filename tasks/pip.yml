@@ -1,0 +1,142 @@
+---
+# yamllint disable rule:line-length
+###############################################################################
+# VENV PIP Install
+###############################################################################
+# Install specified PIP packages.
+#
+# Args:
+#   _avenv_venv: str - absolute path to venv directory.
+#   _avenv_setuptools_required: bool - setuptools package required.
+
+- name: 'Install | virtual environment configuration (may take a while)'
+  ansible.builtin.debug:
+    msg: |
+      Virtual environment is being configured. This will take a few minutes.
+
+- name: 'Install | packages'
+  ansible.builtin.include_role:
+    name: 'r_pufky.srv.apt'
+  vars:
+    apt_packages:
+      - '{{ avenv_role_packages }}'
+      - '{{ avenv_packages }}'
+      - '{{ avenv_role_packages_setuptools if _avenv_setuptools_required else [] }}'
+    apt_packages_absent:
+      - '{{ avenv_packages_absent }}'
+    apt_sources: '{{ avenv_apt_sources }}'
+    apt_package_update_cache: true
+
+- name: 'Install | custom requirements'
+  when: avenv_pip_requirements_source | length > 0
+  block:
+    - name: 'Install | custom requirements | copy'
+      ansible.builtin.copy:
+        src: '{{ avenv_pip_requirements_source }}'
+        dest: '/tmp/custom_requirements.txt'
+        owner: '{{ avenv_user }}'
+        group: '{{ avenv_group }}'
+        mode: '0644'
+        force: true
+
+    - name: 'Install | custom requirements | install'
+      ansible.builtin.pip:
+        break_system_packages: '{{ avenv_pip_break_system_packages | default(false) }}'
+        chdir: '{{ avenv_pip_chdir | default(omit, true) }}'
+        editable: '{{ avenv_pip_editable | default(false) }}'
+        executable: '{{ avenv_pip_executable | default(omit, true) }}'
+        extra_args: '{{ avenv_pip_extra_args | default(omit, true) }}'
+        requirements: '/tmp/custom_requirements.txt'
+        state: '{{ avenv_pip_state | default("present") }}'
+        umask: '{{ avenv_pip_umask | default(omit, true) }}'
+        virtualenv: '{{ _avenv_venv }}'
+        virtualenv_command: '{{ avenv_pip_virtualenv_command | default("virtualenv") }}'
+        virtualenv_python: '{{ avenv_pip_virtualenv_python | default(omit, true) }}'
+        virtualenv_site_packages: '{{ avenv_pip_virtualenv_site_packages | default(false) }}'
+      become: true
+      become_user: '{{ avenv_user }}'
+  always:
+    - name: 'Install | custom requirements | cleanup'
+      ansible.builtin.file:
+        path: '/tmp/custom_requirements.txt'
+        state: 'absent'
+
+- name: 'Install | requirements'
+  when: avenv_pip_requirements_install | length > 0
+  block:
+    - name: 'Install | requirements | detect'
+      ansible.builtin.find:
+        paths: '{{ avenv_pip_requirements_install }}'
+        patterns: 'requirements.txt'
+        follow: true
+        recurse: true
+        file_type: 'file'
+      register: _avenv_pip_requirements
+
+    - name: 'Install | requirements | {{ item.path }}'
+      ansible.builtin.pip:
+        break_system_packages: '{{ avenv_pip_break_system_packages | default(false) }}'
+        chdir: '{{ avenv_pip_chdir | default(omit, true) }}'
+        editable: '{{ avenv_pip_editable | default(false) }}'
+        executable: '{{ avenv_pip_executable | default(omit, true) }}'
+        extra_args: '{{ avenv_pip_extra_args | default(omit, true) }}'
+        requirements: '{{ item.path }}'
+        state: '{{ avenv_pip_state | default("present") }}'
+        umask: '{{ avenv_pip_umask | default(omit, true) }}'
+        virtualenv: '{{ _avenv_venv }}'
+        virtualenv_command: '{{ avenv_pip_virtualenv_command | default("virtualenv") }}'
+        virtualenv_python: '{{ avenv_pip_virtualenv_python | default(omit, true) }}'
+        virtualenv_site_packages: '{{ avenv_pip_virtualenv_site_packages | default(false) }}'
+      become: true
+      become_user: '{{ avenv_user }}'
+      loop: '{{ _avenv_pip_requirements.files }}'
+      loop_control:
+        label: '{{ item.path }}'
+
+- name: 'Install | add packages'
+  when: avenv_pips | length > 0
+  ansible.builtin.pip:
+    break_system_packages: '{{ (item.break_system_packages if item.break_system_packages is defined else avenv_pip_break_system_packages) | default(false) }}'
+    chdir: '{{ (item.chdir if item.chdir is defined else avenv_pip_chdir) | default(omit, true) }}'
+    editable: '{{ (item.editable if item.editable is defined else avenv_pip_editable) | default(false) }}'
+    executable: '{{ (item.executable if item.executable is defined else avenv_pip_executable) | default(omit, true) }}'
+    extra_args: '{{ (item.extra_args if item.extra_args is defined else avenv_pip_extra_args) | default(omit, true) }}'
+    name: '{{ (item.name if item.name is defined else avenv_packages_pip) }}'
+    requirements: '{{ item.requirements | default(omit, true) }}'
+    state: '{{ (item.state if item.state is defined else avenv_pip_state) | default("present") }}'
+    umask: '{{ (item.umask if item.umask is defined else avenv_pip_umask) | default(omit, true) }}'
+    version: '{{ item.version | default(omit, true) }}'
+    virtualenv: '{{ _avenv_venv }}'
+    virtualenv_command: '{{ (item.virtualenv_command if item.virtualenv_command is defined else avenv_pip_virtualenv_command) | default("virtualenv") }}'
+    virtualenv_python: '{{ (item.virtualenv_python if item.virtualenv_python is defined else avenv_pip_virtualenv_python) | default(omit, true) }}'
+    virtualenv_site_packages: '{{ (item.virtualenv_site_packages if item.virtualenv_site_packages is defined else avenv_pip_virtualenv_site_packages) | default(false) }}'
+  become: true
+  become_user: '{{ avenv_user }}'
+  loop: '{{ avenv_pips }}'
+  loop_control:
+    label: '{{ item.name }}'
+
+- name: 'Install | set helper script'
+  when: avenv_script_install
+  ansible.builtin.template:
+    src: 'exec.j2'
+    dest: '{{ _avenv_venv }}/bin/{{ avenv_script_name | default("exec") }}'
+    owner: '{{ avenv_user }}'
+    group: '{{ avenv_group }}'
+    mode: '0770'
+
+- name: 'Install | remove helper script'
+  when: not avenv_script_install
+  ansible.builtin.file:
+    path: '{{ _avenv_venv }}/bin/{{ avenv_script_name | default("exec") }}'
+    state: 'absent'
+
+- name: 'Install | secure environment'
+  when: avenv_mode | length > 0
+  ansible.builtin.file:
+    path: '{{ _avenv_venv }}'
+    owner: '{{ avenv_user }}'
+    group: '{{ avenv_group }}'
+    mode: '{{ avenv_mode | default("a-st,g-w,o-rwx") }}'
+    recurse: true
+    state: 'directory'

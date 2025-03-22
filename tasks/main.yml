@@ -1,0 +1,5 @@
+---
+- name: 'Main | prep'
+  ansible.builtin.include_tasks: 'prep.yml'
+- name: 'Main | pip'
+  ansible.builtin.include_tasks: 'pip.yml'

@@ -1,0 +1,14 @@
+---
+# yamllint disable rule:line-length
+- name: 'Default | prepare'
+  hosts: 'all'
+  gather_facts: false
+  become: true
+  tasks:
+    - name: 'Default | prepare | set /tmp/requirements.txt'
+      ansible.builtin.copy:
+        src: '{{ lookup("env", "MOLECULE_SCENARIO_DIRECTORY") }}/files/requirements_path.txt'
+        dest: '/tmp/requirements.txt'
+        owner: 'root'
+        group: 'root'
+        mode: '0644'
