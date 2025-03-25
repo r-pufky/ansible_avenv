@@ -116,7 +116,7 @@ avenv_pip_requirements_install: ''
 #     list of dict - ansible.builtin.pip.
 #   - comment: str - Package comment notes.
 #         Default: omit.
-#   - break_system_packages: bool - Allow pip to modify an externally-managed
+#     break_system_packages: bool - Allow pip to modify an externally-managed
 #           Python installation as defined by PEP 668.
 #         Default: avenv_pip_break_system_packages.
 #     chdir: str - Change to this directory before running the command.

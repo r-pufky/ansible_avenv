@@ -90,6 +90,21 @@ and groups must be managed outside of the role.
     avenv_mode: 'a-st,g-w,o-rwx'
 ```
 
+### Putting it all together (create venv for a real app)
+Create a complete virtual environment for paperless-ngx.
+
+```yaml
+- name: 'Install | create virtual environment'
+  ansible.builtin.include_role:
+    name: 'r_pufky.srv.avenv'
+  vars:
+    avenv_name: 'paperless-ngx'
+    avenv_user: 'paperless'
+    avenv_group: 'paperless'
+    avenv_pip_extra_args: '--upgrade'
+    avenv_pip_requirements_install: '/opt/paperless'
+```
+
 ## Development
 Configure [environment](https://github.com/r-pufky/ansible_collection_srv/blob/main/docs/dev/environment/README.md)
 

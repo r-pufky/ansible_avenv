@@ -73,7 +73,7 @@
         file_type: 'file'
       register: _avenv_pip_requirements
 
-    - name: 'Install | requirements | {{ item.path }}'
+    - name: 'Install | requirements | install'
       ansible.builtin.pip:
         break_system_packages: '{{ avenv_pip_break_system_packages | default(false) }}'
         chdir: '{{ avenv_pip_chdir | default(omit, true) }}'
