@@ -1,5 +1,4 @@
 ---
-# yamllint disable rule:line-length
 ###############################################################################
 # VENV PIP Install
 ###############################################################################
@@ -9,19 +8,23 @@
 #   _avenv_venv: str - absolute path to venv directory.
 #   _avenv_setuptools_required: bool - setuptools package required.
 
-- name: 'Install | virtual environment configuration (may take a while)'
+- name: 'Install | virtual environment configuration 🗘'
   ansible.builtin.debug:
     msg: |
-      Virtual environment is being configured. This will take a few minutes.
+      🗘 Virtual environment is being configured. This will take a few minutes.
 
 - name: 'Install | packages'
   ansible.builtin.include_role:
-    name: 'r_pufky.srv.apt'
+    name: 'r_pufky.deb.apt'
   vars:
     apt_packages:
       - '{{ avenv_role_packages }}'
       - '{{ avenv_packages }}'
-      - '{{ avenv_role_packages_setuptools if _avenv_setuptools_required else [] }}'
+      - '{{
+          avenv_role_packages_setuptools
+          if _avenv_setuptools_required else
+          []
+        }}'
     apt_packages_absent:
       - '{{ avenv_packages_absent }}'
     apt_sources: '{{ avenv_apt_sources }}'
@@ -41,7 +44,8 @@
 
     - name: 'Install | custom requirements | install'
       ansible.builtin.pip:
-        break_system_packages: '{{ avenv_pip_break_system_packages | default(false) }}'
+        break_system_packages:
+          '{{ avenv_pip_break_system_packages | default(false) }}'
         chdir: '{{ avenv_pip_chdir | default(omit, true) }}'
         editable: '{{ avenv_pip_editable | default(false) }}'
         executable: '{{ avenv_pip_executable | default(omit, true) }}'
@@ -50,9 +54,12 @@
         state: '{{ avenv_pip_state | default("present") }}'
         umask: '{{ avenv_pip_umask | default(omit, true) }}'
         virtualenv: '{{ _avenv_venv }}'
-        virtualenv_command: '{{ avenv_pip_virtualenv_command | default("virtualenv") }}'
-        virtualenv_python: '{{ avenv_pip_virtualenv_python | default(omit, true) }}'
-        virtualenv_site_packages: '{{ avenv_pip_virtualenv_site_packages | default(false) }}'
+        virtualenv_command:
+          '{{ avenv_pip_virtualenv_command | default("virtualenv") }}'
+        virtualenv_python:
+          '{{ avenv_pip_virtualenv_python | default(omit, true) }}'
+        virtualenv_site_packages:
+          '{{ avenv_pip_virtualenv_site_packages | default(false) }}'
       become: true
       become_user: '{{ avenv_user }}'
   always:
@@ -75,7 +82,8 @@
 
     - name: 'Install | requirements | install'
       ansible.builtin.pip:
-        break_system_packages: '{{ avenv_pip_break_system_packages | default(false) }}'
+        break_system_packages:
+          '{{ avenv_pip_break_system_packages | default(false) }}'
         chdir: '{{ avenv_pip_chdir | default(omit, true) }}'
         editable: '{{ avenv_pip_editable | default(false) }}'
         executable: '{{ avenv_pip_executable | default(omit, true) }}'
@@ -84,9 +92,12 @@
         state: '{{ avenv_pip_state | default("present") }}'
         umask: '{{ avenv_pip_umask | default(omit, true) }}'
         virtualenv: '{{ _avenv_venv }}'
-        virtualenv_command: '{{ avenv_pip_virtualenv_command | default("virtualenv") }}'
-        virtualenv_python: '{{ avenv_pip_virtualenv_python | default(omit, true) }}'
-        virtualenv_site_packages: '{{ avenv_pip_virtualenv_site_packages | default(false) }}'
+        virtualenv_command:
+          '{{ avenv_pip_virtualenv_command | default("virtualenv") }}'
+        virtualenv_python:
+          '{{ avenv_pip_virtualenv_python | default(omit, true) }}'
+        virtualenv_site_packages:
+          '{{ avenv_pip_virtualenv_site_packages | default(false) }}'
       become: true
       become_user: '{{ avenv_user }}'
       loop: '{{ _avenv_pip_requirements.files }}'
@@ -96,20 +107,62 @@
 - name: 'Install | add packages'
   when: avenv_pips | length > 0
   ansible.builtin.pip:
-    break_system_packages: '{{ (item.break_system_packages if item.break_system_packages is defined else avenv_pip_break_system_packages) | default(false) }}'
-    chdir: '{{ (item.chdir if item.chdir is defined else avenv_pip_chdir) | default(omit, true) }}'
-    editable: '{{ (item.editable if item.editable is defined else avenv_pip_editable) | default(false) }}'
-    executable: '{{ (item.executable if item.executable is defined else avenv_pip_executable) | default(omit, true) }}'
-    extra_args: '{{ (item.extra_args if item.extra_args is defined else avenv_pip_extra_args) | default(omit, true) }}'
+    break_system_packages: '{{
+        (item.break_system_packages
+          if item.break_system_packages is defined else
+          avenv_pip_break_system_packages) |
+        default(false)
+      }}'
+    chdir: '{{
+        (item.chdir if item.chdir is defined else avenv_pip_chdir) |
+        default(omit, true)
+      }}'
+    editable: '{{
+        (item.editable if item.editable is defined else avenv_pip_editable) |
+        default(false)
+      }}'
+    executable: '{{
+        (item.executable
+         if item.executable is defined else
+         avenv_pip_executable) |
+        default(omit, true)
+      }}'
+    extra_args: '{{
+        (item.extra_args
+         if item.extra_args is defined else
+         avenv_pip_extra_args) |
+        default(omit, true)
+      }}'
     name: '{{ (item.name if item.name is defined else avenv_packages_pip) }}'
     requirements: '{{ item.requirements | default(omit, true) }}'
-    state: '{{ (item.state if item.state is defined else avenv_pip_state) | default("present") }}'
-    umask: '{{ (item.umask if item.umask is defined else avenv_pip_umask) | default(omit, true) }}'
+    state: '{{
+        (item.state if item.state is defined else avenv_pip_state) |
+        default("present")
+      }}'
+    umask: '{{
+        (item.umask if item.umask is defined else avenv_pip_umask) |
+        default(omit, true)
+      }}'
     version: '{{ item.version | default(omit, true) }}'
     virtualenv: '{{ _avenv_venv }}'
-    virtualenv_command: '{{ (item.virtualenv_command if item.virtualenv_command is defined else avenv_pip_virtualenv_command) | default("virtualenv") }}'
-    virtualenv_python: '{{ (item.virtualenv_python if item.virtualenv_python is defined else avenv_pip_virtualenv_python) | default(omit, true) }}'
-    virtualenv_site_packages: '{{ (item.virtualenv_site_packages if item.virtualenv_site_packages is defined else avenv_pip_virtualenv_site_packages) | default(false) }}'
+    virtualenv_command: '{{
+        (item.virtualenv_command
+         if item.virtualenv_command is defined else
+         avenv_pip_virtualenv_command) |
+        default("virtualenv")
+      }}'
+    virtualenv_python: '{{
+        (item.virtualenv_python
+         if item.virtualenv_python is defined else
+         avenv_pip_virtualenv_python) |
+        default(omit, true)
+      }}'
+    virtualenv_site_packages: '{{
+        (item.virtualenv_site_packages
+         if item.virtualenv_site_packages is defined else
+         avenv_pip_virtualenv_site_packages) |
+        default(false)
+      }}'
   become: true
   become_user: '{{ avenv_user }}'
   loop: '{{ avenv_pips }}'

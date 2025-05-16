@@ -4,8 +4,6 @@ Easily manage virtual environments.
 ## Requirements
 [supported platforms](https://github.com/r-pufky/ansible_avenv/blob/main/meta/main.yml)
 
-[collections/roles](https://github.com/r-pufky/ansible_avenv/blob/main/meta/requirements.yml)
-
 ## Role Variables
 [defaults](https://github.com/r-pufky/ansible_avenv/tree/main/defaults/main/)
 
@@ -32,8 +30,8 @@ a subshell.
 ```
 
 ## Dependencies
-Part of the [r_pufky.srv](https://github.com/r-pufky/ansible_collection_srv)
-collection.
+**galaxy-ng** roles cannot be used independently. Part of
+[r_pufky.deb](https://github.com/r-pufky/ansible_collection_deb) collection.
 
 ## Example Playbook
 This role is intended to be called multiple times in other roles with most
@@ -43,7 +41,7 @@ environments require calling role multiple times.
 ### Create my_app venv with 'stopwords' package installed.
 ``` yaml
 - name: 'Create my_app'
-  r_pufky.srv.avenv:
+  r_pufky.deb.avenv:
   vars:
     avenv_name: 'my_app'
     avenv_pips:
@@ -52,11 +50,11 @@ environments require calling role multiple times.
 
 ### Create my_app venv with requirements from ansible controller.
 May be used in conjunction with `avenv_pip_requirements_install` and
-`avenv_pips[].requirments`.
+`avenv_pips[].requirements`.
 
 ``` yaml
 - name: 'Create my_app with requirements from ansible'
-  r_pufky.srv.avenv:
+  r_pufky.deb.avenv:
   vars:
     avenv_name: 'my_app'
     avenv_pip_requirements_source: 'host_vars/venv.example.com/data/requirements.txt'
@@ -70,7 +68,7 @@ conjunction with `avenv_pip_requirements_source` and
 
 ``` yaml
 - name: 'Create my_app with requirements from remote'
-  r_pufky.srv.avenv:
+  r_pufky.deb.avenv:
   vars:
     avenv_name: 'my_app'
     avenv_pip_requirements_install: '/opt/my_app'
@@ -82,7 +80,7 @@ and groups must be managed outside of the role.
 
 ``` yaml
 - name: 'Create my_app with a restricted user and locked down permissions'
-  r_pufky.srv.avenv:
+  r_pufky.deb.avenv:
   vars:
     avenv_name: 'my_app'
     avenv_user: 'some_user'
@@ -96,7 +94,7 @@ Create a complete virtual environment for paperless-ngx.
 ```yaml
 - name: 'Install | create virtual environment'
   ansible.builtin.include_role:
-    name: 'r_pufky.srv.avenv'
+    name: 'r_pufky.deb.avenv'
   vars:
     avenv_name: 'paperless-ngx'
     avenv_user: 'paperless'
@@ -106,7 +104,7 @@ Create a complete virtual environment for paperless-ngx.
 ```
 
 ## Development
-Configure [environment](https://github.com/r-pufky/ansible_collection_srv/blob/main/docs/dev/environment/README.md)
+Configure [environment](https://github.com/r-pufky/ansible_collection_docs/blob/main/dev/environment/README.md)
 
 Run all unit tests:
 ``` bash

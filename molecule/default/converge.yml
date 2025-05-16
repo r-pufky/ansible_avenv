@@ -3,6 +3,6 @@
   hosts: 'all'
   gather_facts: false
   tasks:
-    - name: 'Default | converge | apply r_pufky.srv.avenv'
+    - name: 'Default | converge | apply r_pufky.deb.avenv'
       ansible.builtin.include_role:
-        name: 'r_pufky.srv.avenv'
+        name: 'r_pufky.deb.avenv'

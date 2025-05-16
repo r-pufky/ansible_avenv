@@ -1,5 +1,4 @@
 ---
-# yamllint disable rule:line-length
 ###############################################################################
 # Ansible-VENV Prep
 ###############################################################################
@@ -14,8 +13,14 @@
 
 - name: 'Prep | sanitize options'
   ansible.builtin.set_fact:
-    _avenv_venv: '{{ avenv_config_dir if avenv_config_dir.endswith("/") else avenv_config_dir ~ "/"}}{{ avenv_name }}'
-    _avenv_setuptools_required: '{{ avenv_pips | default([]) | map(attribute="executable") | length > 0 }}'
+    _avenv_venv: '{{
+        avenv_config_dir
+        if avenv_config_dir.endswith("/") else
+        avenv_config_dir ~ "/"
+      }}{{ avenv_name }}'
+    _avenv_setuptools_required: '{{
+        avenv_pips | default([]) | map(attribute="executable") | length > 0
+      }}'
 
 - name: 'Prep | create config directory'
   ansible.builtin.file:

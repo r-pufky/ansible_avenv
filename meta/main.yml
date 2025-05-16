@@ -1,5 +1,6 @@
 ---
 galaxy_info:
+  role_name: 'avenv'
   author: 'r_pufky'
   description: 'Manage virtual environments.'
   company: 'N/A'

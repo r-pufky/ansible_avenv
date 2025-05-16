@@ -8,6 +8,7 @@
 #
 # Reference:
 # * https://stackoverflow.com/questions/41573587/what-is-the-difference-between-venv-pyvenv-pyenv-virtualenv-virtualenvwrappe
+# yamllint enable rule:line-length
 
 # Ansible-VENV packages to install. Default: [].
 avenv_packages: []
@@ -22,7 +23,7 @@ avenv_packages_absent: []
 # APT sources based on signing keys, potentially removing configured APT
 # sources).
 #
-# Uses r_pufky.srv.apt.apt_sources format.
+# Uses r_pufky.deb.apt.apt_sources format.
 #
 # Default: [] (unmanaged).
 avenv_apt_sources: []

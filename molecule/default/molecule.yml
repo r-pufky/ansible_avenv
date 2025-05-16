@@ -1,10 +1,16 @@
 ---
-# yamllint disable rule:line-length
-# Confirm:
-# * Virtual environment directory created.
-# * Virtual environment works (via exec script pip list for other tests).
-# * Sourcing requirements.txt from ansible controller works.
-# * Searching for requirements.txt from a specified location works.
+###############################################################################
+# Default
+###############################################################################
+# Python3 virtual environment is created with correct options.
+#
+# Tests:
+# * virtual environment created.
+# * PIP packages are installed.
+# * User defined packages are installed.
+# * Ansible controller based requirements.txt applied.
+# * Path based requirements.txt applied.
+
 dependency:
   name: 'galaxy'
 driver:
@@ -20,7 +26,10 @@ provisioner:
   inventory:
     group_vars:
       all:
-        avenv_pip_requirements_source: '{{ lookup("env", "MOLECULE_SCENARIO_DIRECTORY") }}/files/requirements_controller.txt'
+        avenv_pip_requirements_source: '{{
+            lookup("env", "MOLECULE_SCENARIO_DIRECTORY") ~
+            "/files/requirements_controller.txt"
+          }}'
         avenv_pip_requirements_install: '/tmp'
         avenv_pips:
           - comment: 'Upgrade these when installing'
