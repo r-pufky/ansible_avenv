@@ -38,6 +38,9 @@ This role is intended to be called multiple times in other roles with most
 options being set per repository release being downloaded. Multiple virtual
 environments require calling role multiple times.
 
+Both [**PIP**](https://pip.pypa.io/en/stable/getting-started/) and
+[**UV**](https://docs.astral.sh/uv/) managers may be used.
+
 ### Create my_app venv with 'stopwords' package installed.
 ``` yaml
 - name: 'Create my_app'
@@ -49,8 +52,8 @@ environments require calling role multiple times.
 ```
 
 ### Create my_app venv with requirements from ansible controller.
-May be used in conjunction with `avenv_pip_requirements_install` and
-`avenv_pips[].requirements`.
+May be used in conjunction with `avenv_[pip|uv]_requirements_install` and
+`avenv_[uv_]pips[].requirements`.
 
 ``` yaml
 - name: 'Create my_app with requirements from ansible'
@@ -63,8 +66,8 @@ May be used in conjunction with `avenv_pip_requirements_install` and
 ### Create my_app venv with requirements from remote directory.
 Requirements may be found on the remote directory and installed automatically.
 Very useful for installing source packages from github. May be used in
-conjunction with `avenv_pip_requirements_source` and
-`avenv_pips[].requirments`.
+conjunction with `avenv_[pip|uv]_requirements_source` and
+`avenv_[uv_]pips[].requirements`.
 
 ``` yaml
 - name: 'Create my_app with requirements from remote'
@@ -72,6 +75,17 @@ conjunction with `avenv_pip_requirements_source` and
   vars:
     avenv_name: 'my_app'
     avenv_pip_requirements_install: '/opt/my_app'
+```
+
+### Create my_app venv using UV manager with 'stopwords' package installed.
+``` yaml
+- name: 'Create my_app'
+  r_pufky.deb.avenv:
+  vars:
+    avenv_name: 'my_app'
+    avenv_manager: 'uv'
+    avenv_uv_pips:
+      - name: 'stopwords'
 ```
 
 ### Permissions

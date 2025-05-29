@@ -20,3 +20,19 @@ avenv_role_packages:
 
 avenv_role_packages_setuptools:
   - 'python3-setuptools'
+
+###############################################################################
+# Python UV Support
+###############################################################################
+# Extremely simple, fast Rust based Python package and project manager.
+#
+# Reference:
+# * https://docs.astral.sh/uv/
+
+avenv_role_uv_owner: 'astral-sh'
+avenv_role_uv_repo: 'uv'
+avenv_role_uv_asset: 'uv-x86_64-unknown-linux-gnu.tar.gz'
+avenv_role_uv_checksum: 'uv-x86_64-unknown-linux-gnu.tar.gz.sha256'
+avenv_role_extract_dir: '/var/lib/uv'
+avenv_role_extract_mode: 'a-st,o-rwx'
+avenv_role_extract_extra_opts: '--strip-components=1'

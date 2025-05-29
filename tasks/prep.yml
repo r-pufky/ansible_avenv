@@ -5,11 +5,11 @@
 # Create venv full path and determine if setuptools is required because of
 # executable option.
 #
-# Exports:
-#   _avenv_venv: str - absolute path to venv directory.
-#
 # Generates:
 #   _avenv_setuptools_required: bool - setuptools package required.
+#
+# Exports:
+#   _avenv_venv: str - absolute path to venv directory.
 
 - name: 'Prep | sanitize options'
   ansible.builtin.set_fact:
@@ -19,7 +19,8 @@
         avenv_config_dir ~ "/"
       }}{{ avenv_name }}'
     _avenv_setuptools_required: '{{
-        avenv_pips | default([]) | map(attribute="executable") | length > 0
+        avenv_pips or avenv_uv_pips | default([]) |
+        map(attribute="executable") | length > 0
       }}'
 
 - name: 'Prep | create config directory'
@@ -30,7 +31,24 @@
     mode: '0755'
     state: 'directory'
 
-- name: 'Config | create virtual environment root'
+- name: 'Prep | packages'
+  ansible.builtin.include_role:
+    name: 'r_pufky.deb.apt'
+  vars:
+    apt_packages:
+      - '{{ avenv_role_packages }}'
+      - '{{ avenv_packages }}'
+      - '{{
+          avenv_role_packages_setuptools
+          if _avenv_setuptools_required else
+          []
+        }}'
+    apt_packages_absent:
+      - '{{ avenv_packages_absent }}'
+    apt_sources: '{{ avenv_apt_sources }}'
+    apt_package_update_cache: true
+
+- name: 'Prep | create virtual environment root'
   ansible.builtin.file:
     path: '{{ _avenv_venv }}'
     owner: '{{ avenv_user }}'

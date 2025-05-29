@@ -1,0 +1,209 @@
+---
+###############################################################################
+# UV Install
+###############################################################################
+# Install specified UV PIP packages.
+#
+# Always confirm changes to steps are mirrors to other managers.
+#
+# Args:
+#   _avenv_venv: str - absolute path to venv directory.
+#
+# Reference:
+# * https://docs.astral.sh/uv/getting-started/installation/
+
+- name: 'UV | virtual environment configuration 🗘'
+  ansible.builtin.debug:
+    msg: |
+      🗘 Virtual environment is being configured. This will take a few minutes.
+
+- name: 'UV | {{ avenv_uv_version }}'
+  ansible.builtin.include_role:
+    name: 'r_pufky.deb.repo'
+  vars:
+    repo_release_owner: '{{ avenv_role_uv_owner }}'
+    repo_release_repo: '{{ avenv_role_uv_repo }}'
+    repo_release_tag: '{{ avenv_uv_version }}'
+    repo_release_asset: '{{ avenv_role_uv_asset }}'
+    repo_release_checksum: '{{ avenv_role_uv_checksum }}'
+    repo_extract_dir: '{{ avenv_role_extract_dir }}'
+    repo_extract_mode: '{{ avenv_role_extract_mode }}'
+    repo_extract_extra_opts: '{{ avenv_role_extract_extra_opts }}'
+
+- name: 'UV | hardlink /usr/local/bin/{{ item }} -> {{ _repo_dir }}/{{ item }}'
+  when: _repo_changed  # noqa name[template] full symlink
+  ansible.builtin.file:
+    src: '{{ _repo_dir }}/{{ item }}'
+    dest: '/usr/local/bin/{{ item }}'
+    owner: 'root'
+    group: 'root'
+    mode: '0755'
+    force: true
+    state: 'hard'
+  loop:
+    - 'uv'
+    - 'uvx'
+
+- name: 'UV | custom requirements'
+  when: avenv_uv_requirements_source | length > 0
+  block:
+    - name: 'UV | custom requirements | copy'
+      ansible.builtin.copy:
+        src: '{{ avenv_uv_requirements_source }}'
+        dest: '/tmp/custom_requirements.txt'
+        owner: '{{ avenv_user }}'
+        group: '{{ avenv_group }}'
+        mode: '0644'
+        force: true
+
+    - name: 'UV | custom requirements | install'
+      moreati.uv.pip:
+        break_system_packages:
+          '{{ avenv_uv_break_system_packages | default(false) }}'
+        chdir: '{{ avenv_uv_chdir | default(omit, true) }}'
+        editable: '{{ avenv_uv_editable | default(false) }}'
+        executable: '{{ avenv_uv_executable | default(omit, true) }}'
+        extra_args: '{{ avenv_uv_extra_args | default(omit, true) }}'
+        requirements: '/tmp/custom_requirements.txt'
+        state: '{{ avenv_uv_state | default("present") }}'
+        umask: '{{ avenv_uv_umask | default(omit, true) }}'
+        virtualenv: '{{ _avenv_venv }}'
+        virtualenv_command:
+          '{{ avenv_uv_virtualenv_command | default("uv venv") }}'
+        virtualenv_python:
+          '{{ avenv_uv_virtualenv_python | default(omit, true) }}'
+        virtualenv_site_packages:
+          '{{ avenv_uv_virtualenv_site_packages | default(false) }}'
+      become: true
+      become_user: '{{ avenv_user }}'
+  always:
+    - name: 'UV | custom requirements | cleanup'
+      ansible.builtin.file:
+        path: '/tmp/custom_requirements.txt'
+        state: 'absent'
+
+- name: 'UV | requirements'
+  when: avenv_uv_requirements_install | length > 0
+  block:
+    - name: 'UV | requirements | detect'
+      ansible.builtin.find:
+        paths: '{{ avenv_uv_requirements_install }}'
+        patterns: 'requirements.txt'
+        follow: true
+        recurse: true
+        file_type: 'file'
+      register: _avenv_uv_requirements
+
+    - name: 'UV | requirements | install'
+      moreati.uv.pip:
+        break_system_packages:
+          '{{ avenv_uv_break_system_packages | default(false) }}'
+        chdir: '{{ avenv_uv_chdir | default(omit, true) }}'
+        editable: '{{ avenv_uv_editable | default(false) }}'
+        executable: '{{ avenv_uv_executable | default(omit, true) }}'
+        extra_args: '{{ avenv_uv_extra_args | default(omit, true) }}'
+        requirements: '{{ item.path }}'
+        state: '{{ avenv_uv_state | default("present") }}'
+        umask: '{{ avenv_uv_umask | default(omit, true) }}'
+        virtualenv: '{{ _avenv_venv }}'
+        virtualenv_command:
+          '{{ avenv_uv_virtualenv_command | default("uv venv") }}'
+        virtualenv_python:
+          '{{ avenv_uv_virtualenv_python | default(omit, true) }}'
+        virtualenv_site_packages:
+          '{{ avenv_uv_virtualenv_site_packages | default(false) }}'
+      become: true
+      become_user: '{{ avenv_user }}'
+      loop: '{{ _avenv_uv_requirements.files }}'
+      loop_control:
+        label: '{{ item.path }}'
+
+- name: 'UV | add packages'
+  when: avenv_uv_pips | length > 0
+  moreati.uv.pip:
+    break_system_packages: '{{
+        (item.break_system_packages
+          if item.break_system_packages is defined else
+          avenv_uv_break_system_packages) |
+        default(false)
+      }}'
+    chdir: '{{
+        (item.chdir if item.chdir is defined else avenv_uv_chdir) |
+        default(omit, true)
+      }}'
+    editable: '{{
+        (item.editable if item.editable is defined else avenv_uv_editable) |
+        default(false)
+      }}'
+    executable: '{{
+        (item.executable
+         if item.executable is defined else
+         avenv_uv_executable) |
+        default(omit, true)
+      }}'
+    extra_args: '{{
+        (item.extra_args
+         if item.extra_args is defined else
+         avenv_uv_extra_args) |
+        default(omit, true)
+      }}'
+    name: '{{ (item.name if item.name is defined else avenv_packages_pip) }}'
+    requirements: '{{ item.requirements | default(omit, true) }}'
+    state: '{{
+        (item.state if item.state is defined else avenv_uv_state) |
+        default("present")
+      }}'
+    umask: '{{
+        (item.umask if item.umask is defined else avenv_uv_umask) |
+        default(omit, true)
+      }}'
+    version: '{{ item.version | default(omit, true) }}'
+    virtualenv: '{{ _avenv_venv }}'
+    virtualenv_command: '{{
+        (item.virtualenv_command
+         if item.virtualenv_command is defined else
+         avenv_uv_virtualenv_command) |
+        default("uv venv")
+      }}'
+    virtualenv_python: '{{
+        (item.virtualenv_python
+         if item.virtualenv_python is defined else
+         avenv_uv_virtualenv_python) |
+        default(omit, true)
+      }}'
+    virtualenv_site_packages: '{{
+        (item.virtualenv_site_packages
+         if item.virtualenv_site_packages is defined else
+         avenv_uv_virtualenv_site_packages) |
+        default(false)
+      }}'
+  become: true
+  become_user: '{{ avenv_user }}'
+  loop: '{{ avenv_uv_pips }}'
+  loop_control:
+    label: '{{ item.name }}'
+
+- name: 'UV | set helper script'
+  when: avenv_script_install
+  ansible.builtin.template:
+    src: 'exec.j2'
+    dest: '{{ _avenv_venv }}/bin/{{ avenv_script_name | default("exec") }}'
+    owner: '{{ avenv_user }}'
+    group: '{{ avenv_group }}'
+    mode: '0770'
+
+- name: 'UV | remove helper script'
+  when: not avenv_script_install
+  ansible.builtin.file:
+    path: '{{ _avenv_venv }}/bin/{{ avenv_script_name | default("exec") }}'
+    state: 'absent'
+
+- name: 'UV | secure environment'
+  when: avenv_mode | length > 0
+  ansible.builtin.file:
+    path: '{{ _avenv_venv }}'
+    owner: '{{ avenv_user }}'
+    group: '{{ avenv_group }}'
+    mode: '{{ avenv_mode | default("a-st,g-w,o-rwx") }}'
+    recurse: true
+    state: 'directory'

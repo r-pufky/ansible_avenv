@@ -3,7 +3,7 @@
 # Execute command in virtual environment.
 #
 # Must be executed in current shell, not subshell (use source or .):
-# ./exec pip list
-# source exec pip list
+# ./exec {{ 'uv ' if avenv_manager | lower == 'uv' }}pip list
+# source exec {{ 'uv ' if avenv_manager | lower == 'uv' }}pip list
 #
 source {{ _avenv_venv }}/bin/activate && $@

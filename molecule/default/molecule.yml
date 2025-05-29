@@ -5,11 +5,12 @@
 # Python3 virtual environment is created with correct options.
 #
 # Tests:
-# * virtual environment created.
+# * Virtual environment created.
 # * PIP packages are installed.
 # * User defined packages are installed.
 # * Ansible controller based requirements.txt applied.
 # * Path based requirements.txt applied.
+# * Same tests pass for pip, uv managers.
 
 dependency:
   name: 'galaxy'
@@ -26,12 +27,34 @@ provisioner:
   inventory:
     group_vars:
       all:
+        repo_testing_enable: true
+        repo_testing_versions:
+          - comment: 'uv'
+            version: '0.7.8'
+            asset: '{{
+                lookup("env", "MOLECULE_PROJECT_DIRECTORY") ~
+                "/molecule/cache/uv-x86_64-unknown-linux-gnu.tar.gz"
+              }}'
+            checksum: '{{
+                lookup("env", "MOLECULE_PROJECT_DIRECTORY") ~
+                "/molecule/cache/uv-x86_64-unknown-linux-gnu.tar.gz.sha256"
+              }}'
         avenv_pip_requirements_source: '{{
             lookup("env", "MOLECULE_SCENARIO_DIRECTORY") ~
             "/files/requirements_controller.txt"
           }}'
         avenv_pip_requirements_install: '/tmp'
         avenv_pips:
+          - comment: 'Upgrade these when installing'
+            name:
+              - 'stopwords'
+            extra_args: '--upgrade'
+        avenv_uv_requirements_source: '{{
+            lookup("env", "MOLECULE_SCENARIO_DIRECTORY") ~
+            "/files/requirements_controller.txt"
+          }}'
+        avenv_uv_requirements_install: '/tmp'
+        avenv_uv_pips:
           - comment: 'Upgrade these when installing'
             name:
               - 'stopwords'

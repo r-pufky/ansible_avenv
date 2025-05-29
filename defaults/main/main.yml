@@ -17,6 +17,20 @@ avenv_config_dir: '/var/venv'
 # Default: 'venv'.
 avenv_name: 'venv'
 
+# Virtual environment manager.
+#
+# Special Case:
+#   * Role will only apply one manager per call; role must be called multiple
+#     times with different manager settings when target machine requires
+#     multiple managers.
+#
+# Values:
+#   pip: Use PIP (Package Installer for Python) (default).
+#    uv: Use UV (Rust based extremely fast Python package and project manager).
+#
+# Default: 'pip'.
+avenv_manager: 'pip'
+
 # Install virtual environment helper script?
 #
 # Deployed to: avenv_config_dir/avenv_name/bin/exec
@@ -25,6 +39,8 @@ avenv_name: 'venv'
 # current shell, not subshell (use source or .):
 # * ./exec pip list
 # * source exec pip list
+# * ./exec uv pip list
+# * source exec uv pip list
 #
 # Default: True.
 avenv_script_install: true

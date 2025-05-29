@@ -3,50 +3,68 @@
   hosts: 'all'
   gather_facts: false
   tasks:
-    - name: 'Default | verify | /var/venv/venv'
+    - name: 'Default | verify | /var/venv'
       ansible.builtin.include_role:
         name: 'r_pufky.lib.tests'
         tasks_from: 'file.yml'
       vars:
-        test_name: 'Default | verify | /var/venv/venv'
-        test_file: '/var/venv/venv'
+        test_name: 'Default | verify | /var/venv/{{ item }}'
+        test_file: '/var/venv/{{ item }}'
         test_owner: 'root'
         test_group: 'root'
         test_mode: '0750'
         test_state: 'directory'
+      loop:
+        - 'pip'
+        - 'uv'
 
-    - name: 'Default | verify | query PIP packages'
+    - name: 'Default | verify | query pip manager packages'
       ansible.builtin.shell: >-
         set -o pipefail &&
-        source /var/venv/venv/bin/exec pip list
+        source /var/venv/pip/bin/exec pip list
       args:
         executable: '/bin/bash'
       changed_when: false
       register: _test_avenv_pip
+
+    - name: 'Default | verify | query uv manager packages'
+      ansible.builtin.shell: >-
+        set -o pipefail &&
+        source /var/venv/uv/bin/exec uv pip list
+      args:
+        executable: '/bin/bash'
+      changed_when: false
+      register: _test_avenv_uv
 
     - name: 'Default | verify | assert user defined packages'
       ansible.builtin.assert:
         quiet: true
         that:
           - '"stopwords" in _test_avenv_pip.stdout'
+          - '"stopwords" in _test_avenv_uv.stdout'
         fail_msg: >
           ✘ stopwords PIP package should be installed.
-          ({{ _test_avenv_pip.stdout }}).
+          ({{ _test_avenv_pip.stdout }})
+          ({{ _test_avenv_uv.stdout }}).
 
     - name: 'Default | verify | assert controller requirements.txt'
       ansible.builtin.assert:
         quiet: true
         that:
           - '"amqp" in _test_avenv_pip.stdout'
+          - '"amqp" in _test_avenv_uv.stdout'
         fail_msg: >
           ✘ amqp PIP package should be installed.
-          ({{ _test_avenv_pip.stdout }}).
+          ({{ _test_avenv_pip.stdout }})
+          ({{ _test_avenv_uv.stdout }}).
 
     - name: 'Default | verify | assert path requirements.txt'
       ansible.builtin.assert:
         quiet: true
         that:
           - '"anyio" in _test_avenv_pip.stdout'
+          - '"anyio" in _test_avenv_uv.stdout'
         fail_msg: >
           ✘ anyio PIP package should be installed.
-          ({{ _test_avenv_pip.stdout }}).
+          ({{ _test_avenv_pip.stdout }})
+          ({{ _test_avenv_uv.stdout }}).

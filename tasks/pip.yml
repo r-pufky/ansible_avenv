@@ -4,36 +4,20 @@
 ###############################################################################
 # Install specified PIP packages.
 #
+# Always confirm changes to steps are mirrors to other managers.
+#
 # Args:
 #   _avenv_venv: str - absolute path to venv directory.
-#   _avenv_setuptools_required: bool - setuptools package required.
 
-- name: 'Install | virtual environment configuration 🗘'
+- name: 'Pip | virtual environment configuration 🗘'
   ansible.builtin.debug:
     msg: |
       🗘 Virtual environment is being configured. This will take a few minutes.
 
-- name: 'Install | packages'
-  ansible.builtin.include_role:
-    name: 'r_pufky.deb.apt'
-  vars:
-    apt_packages:
-      - '{{ avenv_role_packages }}'
-      - '{{ avenv_packages }}'
-      - '{{
-          avenv_role_packages_setuptools
-          if _avenv_setuptools_required else
-          []
-        }}'
-    apt_packages_absent:
-      - '{{ avenv_packages_absent }}'
-    apt_sources: '{{ avenv_apt_sources }}'
-    apt_package_update_cache: true
-
-- name: 'Install | custom requirements'
+- name: 'Pip | custom requirements'
   when: avenv_pip_requirements_source | length > 0
   block:
-    - name: 'Install | custom requirements | copy'
+    - name: 'Pip | custom requirements | copy'
       ansible.builtin.copy:
         src: '{{ avenv_pip_requirements_source }}'
         dest: '/tmp/custom_requirements.txt'
@@ -42,7 +26,7 @@
         mode: '0644'
         force: true
 
-    - name: 'Install | custom requirements | install'
+    - name: 'Pip | custom requirements | install'
       ansible.builtin.pip:
         break_system_packages:
           '{{ avenv_pip_break_system_packages | default(false) }}'
@@ -63,15 +47,15 @@
       become: true
       become_user: '{{ avenv_user }}'
   always:
-    - name: 'Install | custom requirements | cleanup'
+    - name: 'Pip | custom requirements | cleanup'
       ansible.builtin.file:
         path: '/tmp/custom_requirements.txt'
         state: 'absent'
 
-- name: 'Install | requirements'
+- name: 'Pip | requirements'
   when: avenv_pip_requirements_install | length > 0
   block:
-    - name: 'Install | requirements | detect'
+    - name: 'Pip | requirements | detect'
       ansible.builtin.find:
         paths: '{{ avenv_pip_requirements_install }}'
         patterns: 'requirements.txt'
@@ -80,7 +64,7 @@
         file_type: 'file'
       register: _avenv_pip_requirements
 
-    - name: 'Install | requirements | install'
+    - name: 'Pip | requirements | install'
       ansible.builtin.pip:
         break_system_packages:
           '{{ avenv_pip_break_system_packages | default(false) }}'
@@ -104,7 +88,7 @@
       loop_control:
         label: '{{ item.path }}'
 
-- name: 'Install | add packages'
+- name: 'Pip | add packages'
   when: avenv_pips | length > 0
   ansible.builtin.pip:
     break_system_packages: '{{
@@ -169,7 +153,7 @@
   loop_control:
     label: '{{ item.name }}'
 
-- name: 'Install | set helper script'
+- name: 'Pip | set helper script'
   when: avenv_script_install
   ansible.builtin.template:
     src: 'exec.j2'
@@ -178,13 +162,13 @@
     group: '{{ avenv_group }}'
     mode: '0770'
 
-- name: 'Install | remove helper script'
+- name: 'Pip | remove helper script'
   when: not avenv_script_install
   ansible.builtin.file:
     path: '{{ _avenv_venv }}/bin/{{ avenv_script_name | default("exec") }}'
     state: 'absent'
 
-- name: 'Install | secure environment'
+- name: 'Pip | secure environment'
   when: avenv_mode | length > 0
   ansible.builtin.file:
     path: '{{ _avenv_venv }}'

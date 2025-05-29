@@ -1,5 +1,11 @@
 ---
-- name: 'Main | prep'
+- name: 'Prep'
   ansible.builtin.include_tasks: 'prep.yml'
-- name: 'Main | pip'
+
+- name: 'Pip'
+  when: avenv_manager | lower == 'pip'
   ansible.builtin.include_tasks: 'pip.yml'
+
+- name: 'UV'
+  when: avenv_manager | lower == 'uv'
+  ansible.builtin.include_tasks: 'uv.yml'

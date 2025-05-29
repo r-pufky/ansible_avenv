@@ -1,33 +1,51 @@
 ---
 ###############################################################################
-# Default PIP Options
+# Default UV Options
 ###############################################################################
-# These options are used for any unspecified avenv_pip options.
+# These options are used for any unspecified avenv_uv options.
+#
+# Reference:
+# * https://docs.astral.sh/uv/
 
-# Allow pip to modify externally-managed Python installation (PEP 668)?
+# UV Release.
+#
+# Versions (Schematic):
+#       MAJOR: Safe - static binary release. May affect existing deployments.
+#       MINOR: Safe - static binary release. May affect existing deployments.
+#       PATCH: Safe - static binary release. May affect existing deployments.
+#   RECOMMEND: Use static version.
+#
+# Values:
+#   {VERSION}: Tagged release to use ('0.7.8').
+#      latest: Use latest stable release.
+#
+# Default: '0.7.8'.
+avenv_uv_version: '0.7.8'
+
+# Allow uv pip to modify externally-managed Python installation (PEP 668)?
 #
 # Default: False.
-avenv_pip_break_system_packages: false
+avenv_uv_break_system_packages: false
 
 # Change to this directory before running commands.
 #
 # Default: '' (omit).
-avenv_pip_chdir: ''
+avenv_uv_chdir: ''
 
 # Pass the editable flag? Default: False.
-avenv_pip_editable: false
+avenv_uv_editable: false
 
 # Absolute path to pip executable.
 #
-# If different from Ansible Python interpreter used with pip. Mutually
+# If different from Ansible Python interpreter used with uv pip. Mutually
 # exclusive with virtualenv. Python setuptools will automatically be installed
 # if used.
 #
 # Default: '' (omit).
-avenv_pip_executable: ''
+avenv_uv_executable: ''
 
-# Extra arguments passed to pip. Default: '' (omit).
-avenv_pip_extra_args: ''
+# Extra arguments passed to uv pip. Default: '' (omit).
+avenv_uv_extra_args: ''
 
 # Package install state.
 #
@@ -38,17 +56,17 @@ avenv_pip_extra_args: ''
 #          present: Ensure package is installed (default).
 #
 # Default: 'present'.
-avenv_pip_state: 'present'
+avenv_uv_state: 'present'
 
 # Octal file mask to use during package installation. Default: '' (omit).
-avenv_pip_umask: ''
+avenv_uv_umask: ''
 
 # Absolute path or command to create environment.
 #
 # Additional virtual environment commands may be added via avenv_packages.
 #
-# Default: 'virtualenv'.
-avenv_pip_virtualenv_command: 'virtualenv'
+# Default: 'uv venv'.
+avenv_uv_virtualenv_command: 'uv venv'
 
 # Python executable used for creating the virtual environment.
 #
@@ -58,7 +76,7 @@ avenv_pip_virtualenv_command: 'virtualenv'
 #   * Do not use when virtualenv_command='pyenv'|'-m 'venv'.
 #
 # Default: '' (omit).
-avenv_pip_virtualenv_python: ''
+avenv_uv_virtualenv_python: ''
 
 # Inherit packages from global site-packages directory?
 #
@@ -67,13 +85,13 @@ avenv_pip_virtualenv_python: ''
 # newly created.
 #
 # Default: False.
-avenv_pip_virtualenv_site_packages: false
+avenv_uv_virtualenv_site_packages: false
 
 ###############################################################################
 # Requirements Files
 ###############################################################################
 # independently manage requirements.txt in additional to explicitly specifying
-# it for PIP installations.
+# it for UV installations.
 
 # Custom requirements file.
 #
@@ -81,12 +99,12 @@ avenv_pip_virtualenv_site_packages: false
 #
 # Special Case:
 #   * Applied independently from avenv_requirements_install.
-#   * Applied with avenv_pip_* options.
+#   * Applied with avenv_uv_* options.
 #
 # avenv_requirements_source: 'host_vars/venv.example.com/data/requirements.txt'
 #
 # Default: '' (disabled).
-avenv_pip_requirements_source: ''
+avenv_uv_requirements_source: ''
 
 # Install requirements.txt files from specified location.
 #
@@ -94,47 +112,47 @@ avenv_pip_requirements_source: ''
 # installed in found order.
 #
 # Special Case:
-#   * Applied independently from avenv_pip_requirements_source.
-#   * Applied with avenv_pip_* options.
+#   * Applied independently from avenv_uv_requirements_source.
+#   * Applied with avenv_uv_* options.
 #
 # Values:
 #   {PATH}: Absolute path to search directory.
 #       '': Disable (default).
 #
 # Default: '' (disabled).
-avenv_pip_requirements_install: ''
+avenv_uv_requirements_install: ''
 
 ###############################################################################
-# PIP Package Management
+# UV PIP Package Management
 ###############################################################################
 
-# List of PIP packages to install inside VENV.
+# List of UV PIP packages to install inside VENV.
 #
-# PIP install options override default avenv_pip_* options.
+# UV install options override default avenv_uv_* options.
 #
-# avenv_pips:
-#     list of dict - ansible.builtin.pip.
+# avenv_uv_pips:
+#     list of dict - moreati.uv.pip (ansible.builtin.pip).
 #   - comment: str - Package comment notes.
 #         Default: omit.
 #     break_system_packages: bool - Allow pip to modify an externally-managed
 #           Python installation as defined by PEP 668.
-#         Default: avenv_pip_break_system_packages.
+#         Default: avenv_uv_break_system_packages.
 #     chdir: str - Change to this directory before running the command.
-#         Default: avenv_pip_chdir.
+#         Default: avenv_uv_chdir.
 #     editable: bool - Pass the editable flag?
-#         Default: avenv_pip_editable.
+#         Default: avenv_uv_editable.
 #     executable: str - Absolute path to pip executable, if different from the
 #           Ansible Python interpreter used with pip. Mutually exclusive with
 #           virtualenv. Python setuptools will automatically be installed if
 #           used.
-#         Default: avenv_pip_executable.
+#         Default: avenv_uv_executable.
 #     extra_args: str - Extra arguments passed to pip.
-#         Default: avenv_pip_extra_args.
+#         Default: avenv_uv_extra_args.
 #     name: str or list of str - Python library to install or the
 #           url(bzr+,hg+,git+,svn+) of the remote package.
 #     requirements: str - Absolute path to requirements file, which should be
 #           local to the remote system. Alternatively use
-#           avenv_pip_requirements_install or avenv_pip_requirements_source.
+#           avenv_uv_requirements_install or avenv_uv_requirements_source.
 #         Default: omit.
 #     state: str - Package install state.
 #         Values:
@@ -142,29 +160,29 @@ avenv_pip_requirements_install: ''
 #           forcereinstall: Force install packages.
 #                   latest: Install latest packages.
 #                  present: Ensure package is installed (default).
-#         Default: avenv_pip_state.
+#         Default: avenv_uv_state.
 #     umask: str - Octal file mask to use during package installation.
-#         Default: avenv_pip_umask.
+#         Default: avenv_uv_umask.
 #     version: str - Version to install of Python library specified in name
 #           parameter.
 #         Default: omit.
 #     virtualenv_command: str - Absolute path or command to create virtual
 #           environment. Additional virtual environment commands may be added
 #           via avenv_packages.
-#         Default: avenv_pip_virtualenv.
+#         Default: avenv_uv_virtualenv.
 #     virtualenv_python: str - Python executable used for creating the virtual
 #           environment. When not specified Python version used to run ansible
 #           module is used.
 #         Special Case:
 #           * Do not use when virtualenv_command='pyenv'|'-m venv'.
-#         Default: avenv_pip_virtualenv_python.
+#         Default: avenv_uv_virtualenv_python.
 #     virtualenv_site_packages: bool - Inherit packages from global
 #           site-packages directory? Note that if this setting is changed on an
 #           already existing virtual environment it will not have any effect,
 #           the environment must be deleted and newly created.
-#         Default: avenv_pip_virtualenv_site_packages.
+#         Default: avenv_uv_virtualenv_site_packages.
 #
-# avenv_pips:
+# avenv_uv_pips:
 #   - name:
 #       - 'nltk'
 #       - 'numpy'
@@ -175,4 +193,4 @@ avenv_pip_requirements_install: ''
 #     extra_args: '--upgrade'
 #
 # Default: [].
-avenv_pips: []
+avenv_uv_pips: []
