@@ -12,7 +12,7 @@ avenv_config_dir: '/var/venv'
 
 # Virtual environment name.
 #
-# Created under avenv_service_config_dir.
+# Created under avenv_config_dir.
 #
 # Default: 'venv'.
 avenv_name: 'venv'
