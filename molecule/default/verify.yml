@@ -1,24 +1,25 @@
 ---
-- name: 'Default | verify'
+- name: 'Verify'
   hosts: 'all'
   gather_facts: false
   tasks:
-    - name: 'Default | verify | /var/venv'
+    - name: 'Verify | /var/venv'
       ansible.builtin.include_role:
         name: 'r_pufky.lib.tests'
         tasks_from: 'file.yml'
       vars:
-        test_name: 'Default | verify | /var/venv/{{ item }}'
+        test_name: 'Verify | /var/venv/{{ item }}'
         test_file: '/var/venv/{{ item }}'
         test_owner: 'root'
         test_group: 'root'
         test_mode: '0750'
         test_state: 'directory'
+        test_diff: true
       loop:
         - 'pip'
         - 'uv'
 
-    - name: 'Default | verify | query pip manager packages'
+    - name: 'Verify | query pip manager packages'
       ansible.builtin.shell: >-
         set -o pipefail &&
         source /var/venv/pip/bin/exec pip list
@@ -27,7 +28,7 @@
       changed_when: false
       register: _test_avenv_pip
 
-    - name: 'Default | verify | query uv manager packages'
+    - name: 'Verify | query uv manager packages'
       ansible.builtin.shell: >-
         set -o pipefail &&
         source /var/venv/uv/bin/exec uv pip list
@@ -36,7 +37,7 @@
       changed_when: false
       register: _test_avenv_uv
 
-    - name: 'Default | verify | assert user defined packages'
+    - name: 'Verify | assert user defined packages'
       ansible.builtin.assert:
         quiet: true
         that:
@@ -47,7 +48,7 @@
           ({{ _test_avenv_pip.stdout }})
           ({{ _test_avenv_uv.stdout }}).
 
-    - name: 'Default | verify | assert controller requirements.txt'
+    - name: 'Verify | assert controller requirements.txt'
       ansible.builtin.assert:
         quiet: true
         that:
@@ -58,7 +59,7 @@
           ({{ _test_avenv_pip.stdout }})
           ({{ _test_avenv_uv.stdout }}).
 
-    - name: 'Default | verify | assert path requirements.txt'
+    - name: 'Verify | assert path requirements.txt'
       ansible.builtin.assert:
         quiet: true
         that:

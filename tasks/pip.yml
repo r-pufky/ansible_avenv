@@ -12,7 +12,12 @@
 - name: 'Pip | virtual environment configuration 🗘'
   ansible.builtin.debug:
     msg: |
-      🗘 Virtual environment is being configured. This will take a few minutes.
+      ╭───────────────────────────────────────────────────────────────────╮
+      │                                                                   │
+      │              Virtual environment is being configured.             │
+      │                   This will take a few minutes.                   │
+      │                                                                   │
+      ╰───────────────────────────────────────────────────────────────────╯
 
 - name: 'Pip | custom requirements'
   when: avenv_pip_requirements_source | length > 0
