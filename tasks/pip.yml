@@ -14,8 +14,7 @@
     msg: |
       ╭───────────────────────────────────────────────────────────────────╮
       │                                                                   │
-      │              Virtual environment is being configured.             │
-      │                   This will take a few minutes.                   │
+      │   Configuring virtual environment. This will take a few minutes.  │
       │                                                                   │
       ╰───────────────────────────────────────────────────────────────────╯
 

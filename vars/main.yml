@@ -5,8 +5,8 @@
 ###############################################################################
 
 # Last time Ansible-VENV options were validated against default configuration.
-avenv_role_validate_date: '2025-03-21'
-avenv_role_validate_release: 'bookworm'
+avenv_role_validate_date: '2025-08-21'
+avenv_role_validate_release: 'trixie'
 
 ###############################################################################
 # APT Packages

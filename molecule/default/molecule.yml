@@ -60,8 +60,8 @@ provisioner:
               - 'stopwords'
             extra_args: '--upgrade'
 platforms:
-  - name: 'avenv-debian-12-default'
-    image: 'ghcr.io/hifis-net/debian-systemd:12'
+  - name: 'avenv-debian-13-default'
+    image: 'ghcr.io/hifis-net/debian-systemd:13'
     systemd: 'always'
     volumes:
       - '/sys/fs/cgroup:/sys/fs/cgroup:ro'
